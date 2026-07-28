@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nex-Gen Solar | Next-Generation High-Efficiency PV Modules</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                            glow: '#00f2fe'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js for 3D Visuals -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712;
+            color: #f9fafb;
+            overflow-x: hidden;
+        }
+        /* Custom Glowing effects */
+        .glow-border:hover {
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+            border-color: rgba(14, 165, 233, 0.8);
+        }
+        .text-glow {
+            text-shadow: 0 0 10px rgba(14, 165, 233, 0.6);
+        }
+        .bg-glass {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .bg-glass-heavy {
+            background: rgba(10, 15, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+        /* Hide scrollbars but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Scanning laser effect */
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+        .laser-line {
+            animation: scan 3s infinite linear;
+        }
+    </style>
+</head>
+<body class="selection:bg-brand-500 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="fixed top-0 w-full z-50 bg-glass transition-all duration-300 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-solar-panel text-white text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-brand-500">NEX-GEN</span>
+                    <span class="block text-[9px] text-brand-500 tracking-[0.25em] uppercase font-bold">Solar Technology</span>
+                </div>
+            </a>
+
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+                <a href="#features" class="hover:text-brand-500 transition-colors">Key Features</a>
+                <a href="#interactive-model" class="hover:text-brand-500 transition-colors">3D Viewer</a>
+                <a href="#specifications" class="hover:text-brand-500 transition-colors">Product Lineup</a>
+                <a href="#verification" class="hover:text-brand-500 transition-colors text-brand-500 flex items-center gap-1"><i class="fa-solid fa-shield-halved"></i> Verify Authenticity</a>
+                <a href="#calculator" class="hover:text-brand-500 transition-colors">Yield Calculator</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <a href="#verification" class="px-5 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase bg-brand-500 text-white hover:bg-brand-600 transition-all shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 hover:-translate-y-0.5">
+                    Verify Panel
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen pt-20 flex items-center justify-center overflow-hidden">
+        <!-- Background elements -->
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(14,165,233,0.15),transparent_50%)]"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(16,185,129,0.1),transparent_50%)]"></div>
+        <div class="absolute top-1/4 left-1/10 w-96 h-96 bg-brand-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+            <!-- Left Info -->
+            <div class="lg:col-span-6 space-y-8 text-center lg:text-left">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-500 text-xs font-semibold tracking-wider uppercase">
+                    <span class="flex h-2 w-2 rounded-full bg-brand-500 animate-ping"></span>
+                    Next-Generation PV Technology Launch
+                </div>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
+                    Powering The Future with <br class="hidden sm:inline">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-500 via-brand-glow to-emerald-400">Nex-Gen 720W+</span>
+                </h1>
+                <p class="text-slate-400 text-lg max-w-xl mx-auto lg:mx-0">
+                    Introducing the world's highly advanced N-Type TOPCon Dual Glass Bifacial Solar Panels. Reaching up to <span class="text-white font-semibold">23.2% Efficiency</span> to deliver unmatched yield.
+                </p>
+
+                <!-- Key highlights Grid -->
+                <div class="grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0">
+                    <div class="bg-glass p-3.5 rounded-xl border border-white/5">
+                        <span class="block text-2xl font-bold text-white">720W</span>
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider">Max Output</span>
+                    </div>
+                    <div class="bg-glass p-3.5 rounded-xl border border-white/5">
+                        <span class="block text-2xl font-bold text-emerald-400">23.2%</span>
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider">Efficiency</span>
+                    </div>
+                    <div class="bg-glass p-3.5 rounded-xl border border-white/5">
+                        <span class="block text-2xl font-bold text-brand-500">30Y</span>
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider">Warranty</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                    <a href="#verification" class="w-full sm:w-auto px-8 py-4 rounded-xl font-bold bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white shadow-xl shadow-brand-500/20 hover:shadow-brand-500/40 text-center transition-all transform hover:-translate-y-1">
+                        <i class="fa-solid fa-qrcode mr-2"></i> Verify Serial No.
+                    </a>
+                    <a href="#interactive-model" class="w-full sm:w-auto px-8 py-4 rounded-xl font-bold bg-white/5 border border-white/10 hover:bg-white/10 text-white text-center transition-all">
+                        Interactive 3D Model
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Visual 3D Panel Placeholder / Interactive Canvas area -->
+            <div class="lg:col-span-6 flex justify-center items-center relative h-[450px] sm:h-[550px] lg:h-[600px] w-full rounded-2xl overflow-hidden bg-glass border border-white/5 shadow-2xl">
+                <!-- 3D Canvas will be initialized here -->
+                <div id="hero-3d-canvas-container" class="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"></div>
+                <!-- Controls Overlay UI -->
+                <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between pointer-events-none z-10 bg-black/40 backdrop-blur-md p-3 rounded-lg border border-white/5">
+                    <div class="text-xs text-slate-300">
+                        <p class="font-bold text-white"><i class="fa-solid fa-hand-pointer mr-1 animate-pulse"></i> Interactive 3D Model</p>
+                        <p class="text-[10px] text-slate-400">Drag to rotate • Scroll to zoom</p>
+                    </div>
+                    <div class="flex gap-2 pointer-events-auto">
+                        <button onclick="resetCamera()" class="p-2 bg-brand-500 hover:bg-brand-600 text-white rounded text-xs transition" title="Reset view">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features Section -->
+    <section id="features" class="py-24 relative border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Designed for Outstanding Power Yield</h2>
+                <p class="mt-4 text-slate-400 text-lg">Engineered to outperform traditional technology, Nex-Gen solar panels leverage standard-setting modern silicon layers.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-glass p-8 rounded-2xl border border-white/5 hover:border-brand-500/30 transition-all duration-300 group hover:-translate-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-brand-500/10 flex items-center justify-center text-brand-500 mb-6 group-hover:bg-brand-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-bolt-lightning text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">High Density SMBB Technology</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Super Multi-Busbar technology decreases the distance between busbars, minimizing resistance losses and boosting overall panel output.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-glass p-8 rounded-2xl border border-white/5 hover:border-emerald-500/30 transition-all duration-300 group hover:-translate-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-6 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-layer-group text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">N-Type TOPCon Cell Architecture</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Guarantees higher power generation, lower LID (Light Induced Degradation), and excellent low-light performance on cloudy or dusty days.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-glass p-8 rounded-2xl border border-white/5 hover:border-brand-500/30 transition-all duration-300 group hover:-translate-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-brand-500/10 flex items-center justify-center text-brand-500 mb-6 group-hover:bg-brand-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Dual-Glass Bifaciality</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Generates power from both front and back sides, utilizing reflected ground light to gain up to an extra 25% energy yield.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Lineup Section -->
+    <section id="specifications" class="py-24 relative bg-slate-950/40 border-t border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-500 text-xs font-semibold uppercase tracking-widest block mb-2">Product Family</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Choose Your Nex-Gen Capacity</h2>
+                <p class="mt-4 text-slate-400 text-base">Explore specific outputs carefully modeled to meet modern residential, commercial, and utility requirements.</p>
+            </div>
+
+            <!-- Interactive Specs Selector Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                <!-- Selector List -->
+                <div class="lg:col-span-5 space-y-4">
+                    <button onclick="selectModel('585')" id="btn-585" class="model-select-btn w-full text-left p-6 rounded-2xl bg-glass border border-brand-500/30 shadow-lg shadow-brand-500/5 hover:bg-slate-900/50 transition-all flex justify-between items-center group">
+                        <div>
+                            <span class="text-xs text-brand-500 font-bold uppercase tracking-wider">Premium Residential</span>
+                            <h4 class="text-2xl font-extrabold text-white">Nex-Gen 585W</h4>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-brand-500 transform group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+
+                    <button onclick="selectModel('620')" id="btn-620" class="model-select-btn w-full text-left p-6 rounded-2xl bg-glass border border-white/5 hover:border-white/20 hover:bg-slate-900/50 transition-all flex justify-between items-center group">
+                        <div>
+                            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Commercial / Industrial</span>
+                            <h4 class="text-2xl font-extrabold text-white">Nex-Gen 620W</h4>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-400 transform group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+
+                    <button onclick="selectModel('645')" id="btn-645" class="model-select-btn w-full text-left p-6 rounded-2xl bg-glass border border-white/5 hover:border-white/20 hover:bg-slate-900/50 transition-all flex justify-between items-center group">
+                        <div>
+                            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Heavy Industrial Duty</span>
+                            <h4 class="text-2xl font-extrabold text-white">Nex-Gen 645W</h4>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-400 transform group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+
+                    <button onclick="selectModel('720')" id="btn-720" class="model-select-btn w-full text-left p-6 rounded-2xl bg-glass border border-white/5 hover:border-white/20 hover:bg-slate-900/50 transition-all flex justify-between items-center group">
+                        <div>
+                            <span class="text-xs text-brand-500 font-bold uppercase tracking-wider">Mega-Utility Scaled</span>
+                            <h4 class="text-2xl font-extrabold text-white">Nex-Gen 720W</h4>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-400 transform group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+
+                <!-- Specs Screen Container -->
+                <div class="lg:col-span-7 bg-glass p-8 sm:p-10 rounded-3xl border border-white/10 relative overflow-hidden shadow-2xl">
+                    <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-500/10 rounded-full blur-[80px]"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start border-b border-white/10 pb-6 mb-6">
+                            <div>
+                                <h3 id="spec-title" class="text-3xl font-extrabold text-white">Nex-Gen 585W</h3>
+                                <p id="spec-sub" class="text-brand-500 text-sm font-semibold">Bifacial Double Glass N-Type Panel</p>
+                            </div>
+                            <span id="spec-badge" class="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full border border-emerald-500/20 font-bold">Grade A Premium</span>
+                        </div>
+
+                        <!-- Main Spec Grid -->
+                        <div class="grid grid-cols-2 gap-y-6 gap-x-8">
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-widest block">Module Efficiency</span>
+                                <span id="spec-eff" class="text-2xl font-bold text-white">22.65%</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-widest block">Power Tolerance</span>
+                                <span class="text-2xl font-bold text-emerald-400">0 ~ +5 W</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-widest block">Max Power Voltage (Vmp)</span>
+                                <span id="spec-vmp" class="text-2xl font-bold text-white">43.80V</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-widest block">Max Power Current (Imp)</span>
+                                <span id="spec-imp" class="text-2xl font-bold text-white">13.36A</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-widest block">Dimensions</span>
+                                <span id="spec-dim" class="text-lg font-bold text-white">2278 × 1134 × 30 mm</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-widest block">Weight</span>
+                                <span id="spec-weight" class="text-lg font-bold text-white">32.0 kg</span>
+                            </div>
+                        </div>
+
+                        <!-- Tech Bullet Highlights -->
+                        <div class="mt-8 pt-6 border-t border-white/10 space-y-3">
+                            <div class="flex items-center gap-3 text-sm text-slate-300">
+                                <i class="fa-solid fa-circle-check text-brand-500"></i>
+                                <span>Certified for high wind load (2400 Pa) & snow load (5400 Pa).</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-sm text-slate-300">
+                                <i class="fa-solid fa-circle-check text-brand-500"></i>
+                                <span>Double glass structure mitigates PID risks effectively.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Verification Section -->
+    <section id="verification" class="py-24 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-500/5 to-transparent pointer-events-none"></div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-brand-500/10 text-brand-500 rounded-full border border-brand-500/20 text-xs font-bold uppercase tracking-widest mb-4">
+                    <i class="fa-solid fa-circle-check"></i> Security & Transparency
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Authenticity Verification Portal</h2>
+                <p class="mt-4 text-slate-400">Ensure the authenticity of your Nex-Gen solar panels. Scan the panel QR code or input the serial number below to pull your official Certificate of Authenticity instantly.</p>
+            </div>
+
+            <!-- Verification Card -->
+            <div class="bg-glass-heavy p-8 sm:p-12 rounded-3xl border border-brand-500/20 shadow-2xl relative">
+                <!-- Tabs -->
+                <div class="flex border-b border-white/10 mb-8 gap-6 justify-center">
+                    <button onclick="switchVerifyTab('serial')" id="tab-serial" class="pb-3 text-sm font-bold border-b-2 border-brand-500 text-brand-500 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-keyboard"></i> Manual Serial Code
+                    </button>
+                    <button onclick="switchVerifyTab('qr')" id="tab-qr" class="pb-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-white transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-qrcode"></i> Simulated QR Camera
+                    </button>
+                </div>
+
+                <!-- Serial Input Form -->
+                <div id="panel-serial" class="space-y-6">
+                    <div class="text-center sm:text-left">
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Enter Serial Number</label>
+                        <div class="relative max-w-xl mx-auto sm:mx-0">
+                            <input type="text" id="serial-input" placeholder="e.g. NGS-720-PAK" class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-4 pl-12 text-white font-mono placeholder:text-slate-600 focus:outline-none focus:border-brand-500 transition-all text-lg uppercase tracking-wider">
+                            <i class="fa-solid fa-barcode absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl"></i>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">Demo Serials to test: <span class="text-brand-500 font-mono select-all">NGS-585-PAK</span>, <span class="text-brand-500 font-mono select-all">NGS-620-PAK</span>, <span class="text-brand-500 font-mono select-all">NGS-645-PAK</span>, <span class="text-brand-500 font-mono select-all">NGS-720-PAK</span></p>
+                    </div>
+
+                    <button onclick="verifySerialNumber()" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-500 to-emerald-500 hover:opacity-90 font-bold transition-all shadow-xl shadow-brand-500/10 flex items-center justify-center gap-2 text-white">
+                        <i class="fa-solid fa-shield-halved"></i> Verify & Generate Certificate
+                    </button>
+                </div>
+
+                <!-- QR Scanner Screen (Simulated) -->
+                <div id="panel-qr" class="hidden space-y-6">
+                    <div class="max-w-md mx-auto aspect-square bg-slate-950 rounded-2xl overflow-hidden relative border border-white/10 flex flex-col items-center justify-center">
+                        <!-- Simulated Camera Feed -->
+                        <div id="qr-camera-feed" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+                            <!-- Background matrix / tech lines -->
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(14,165,233,0.1),transparent)]"></div>
+                            <div class="w-48 h-48 border-2 border-brand-500/40 rounded-xl relative flex items-center justify-center overflow-hidden">
+                                <!-- Laser Line -->
+                                <div class="absolute left-0 right-0 h-1 bg-brand-500 laser-line shadow-lg shadow-brand-500"></div>
+                                <i class="fa-solid fa-qrcode text-8xl text-brand-500/20"></i>
+                            </div>
+                            <p class="mt-4 text-xs text-slate-400 relative z-10 px-6">Provide access to camera or simulate alignment of the official QR code printed on the side of Nex-Gen panels.</p>
+                        </div>
+                        
+                        <!-- Simulated Camera Activated Overlay -->
+                        <div id="qr-scanning-overlay" class="hidden absolute inset-0 bg-slate-950 flex flex-col items-center justify-center">
+                            <div class="w-16 h-16 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                            <p class="mt-4 text-sm font-semibold text-brand-500">Decrypting Security Code...</p>
+                        </div>
+                    </div>
+
+                    <button onclick="triggerSimulatedScan()" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-500 to-emerald-500 hover:opacity-90 font-bold transition-all shadow-xl shadow-brand-500/10 flex items-center justify-center gap-2 text-white">
+                        <i class="fa-solid fa-camera"></i> Trigger Auto QR Scan
+                    </button>
+                </div>
+
+                <div id="error-message" class="hidden mt-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg text-center font-medium">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Invalid Serial Number or QR Code. Please check the serial code and try again.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive ROI Calculator Section -->
+    <section id="calculator" class="py-24 relative border-t border-white/5 bg-slate-950/20">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-brand-500 text-xs font-semibold uppercase tracking-widest block mb-2">Yield Analytics</span>
+                <h2 class="text-3xl font-extrabold text-white">Power & Savings Estimator</h2>
+                <p class="mt-4 text-slate-400">Calculate how much clean energy you can harvest based on Pakistan's regional sunshine statistics.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch">
+                <!-- Controls -->
+                <div class="md:col-span-6 bg-glass p-8 rounded-2xl border border-white/5 space-y-6 flex flex-col justify-between">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-3">Average Monthly Electricity Bill (PKR)</label>
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-slate-500">PKR 10k</span>
+                            <span id="bill-val" class="text-lg font-bold text-brand-500">PKR 50,000</span>
+                            <span class="text-xs text-slate-500">PKR 250k+</span>
+                        </div>
+                        <input type="range" id="bill-range" min="10000" max="250000" step="5000" value="50000" oninput="calculateSavings()" class="w-full accent-brand-500 cursor-pointer h-2 bg-slate-800 rounded-lg appearance-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-3">Select Desired Nex-Gen Panel</label>
+                        <select id="calc-panel" onchange="calculateSavings()" class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-500">
+                            <option value="585">Nex-Gen 585W Premium</option>
+                            <option value="620">Nex-Gen 620W Standard</option>
+                            <option value="645">Nex-Gen 645W Heavy</option>
+                            <option value="720" selected>Nex-Gen 720W Mega-Utility</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-3">Average Sun Hours / Day</label>
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-slate-500">3 hrs</span>
+                            <span id="sun-val" class="text-lg font-bold text-emerald-400">5.5 Hours</span>
+                            <span class="text-xs text-slate-500">8 hrs</span>
+                        </div>
+                        <input type="range" id="sun-range" min="3" max="8" step="0.5" value="5.5" oninput="calculateSavings()" class="w-full accent-emerald-500 cursor-pointer h-2 bg-slate-800 rounded-lg appearance-none">
+                    </div>
+                </div>
+
+                <!-- Outputs -->
+                <div class="md:col-span-6 bg-gradient-to-br from-brand-900/40 to-slate-950 p-8 rounded-2xl border border-brand-500/20 flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute right-0 bottom-0 opacity-5 pointer-events-none transform translate-y-12 translate-x-12">
+                        <i class="fa-solid fa-calculator text-[200px]"></i>
+                    </div>
+
+                    <div class="space-y-6 relative z-10">
+                        <h3 class="text-lg font-bold text-white border-b border-white/10 pb-4">Estimated ROI Overview</h3>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <span class="text-xs text-slate-400 uppercase tracking-wider block">Est. System Size</span>
+                                <span id="out-sys-size" class="text-2xl font-black text-white">8.6 kWp</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-400 uppercase tracking-wider block">Panels Required</span>
+                                <span id="out-panels" class="text-2xl font-black text-brand-500">12 Panels</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="text-xs text-slate-400 uppercase tracking-wider block">Estimated Annual Savings</span>
+                            <span id="out-savings" class="text-3xl font-black text-emerald-400">PKR 540,000</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-6 border-t border-white/10 text-xs text-slate-400">
+                        *Calculated using PKR 55 / kWh average slab tariff. Yield can vary based on roof angle, shading, invertor design, and grid availability.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certificate Popup Modal -->
+    <div id="certificate-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center bg-black/80 backdrop-blur-md">
+            
+            <!-- Modal Body -->
+            <div id="certificate-container" class="relative bg-white text-slate-900 rounded-3xl p-6 sm:p-12 w-full max-w-3xl border-[8px] border-amber-500/30 shadow-2xl overflow-hidden scale-95 opacity-0 transition-all duration-300">
+                
+                <!-- Gold Accent Borders and Seals inside Certificate -->
+                <div class="absolute inset-4 border-2 border-amber-600/20 pointer-events-none rounded-xl"></div>
+                <div class="absolute -right-16 -top-16 w-48 h-48 bg-amber-500/5 rounded-full blur-xl pointer-events-none"></div>
+
+                <!-- Close Button -->
+                <button onclick="closeCertificate()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900 z-20">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+
+                <!-- Certificate Content Area -->
+                <div class="relative z-10 text-center">
+                    
+                    <!-- Header -->
+                    <div class="flex flex-col items-center mb-6">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20 mb-3">
+                            <i class="fa-solid fa-certificate text-white text-3xl"></i>
+                        </div>
+                        <h4 class="text-amber-600 font-bold uppercase tracking-[0.2em] text-xs">Security Verified</h4>
+                        <h2 class="text-2xl sm:text-4xl font-extrabold font-serif mt-1">Certificate of Authenticity</h2>
+                        <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest font-sans">This certifies that the solar PV equipment listed is genuine</p>
+                    </div>
+
+                    <!-- Details Box -->
+                    <div class="bg-amber-50/50 rounded-2xl p-6 border border-amber-100 text-left mb-8 max-w-2xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
+                        <div>
+                            <span class="text-[10px] uppercase text-slate-400 tracking-wider font-semibold block">Manufacturer & Importer</span>
+                            <span class="text-sm font-bold text-slate-800">Nex Gen Solar Pakistan</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase text-slate-400 tracking-wider font-semibold block">Device Quality Grade</span>
+                            <span class="text-sm font-bold text-emerald-600 flex items-center gap-1">
+                                <i class="fa-solid fa-shield-halved"></i> Grade A (Highest Performance)
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase text-slate-400 tracking-wider font-semibold block">Module Model</span>
+                            <span id="cert-model" class="text-sm font-bold text-slate-800">Nex-Gen 720W Bifacial TOPCon</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase text-slate-400 tracking-wider font-semibold block">Official Serial Number</span>
+                            <span id="cert-serial" class="text-sm font-mono font-bold text-brand-600 uppercase tracking-wide">NGS-720-PAK-74B08</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase text-slate-400 tracking-wider font-semibold block">Import Region & Clearance</span>
+                            <span id="cert-region" class="text-sm font-bold text-slate-800">Pakistan Customs cleared</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase text-slate-400 tracking-wider font-semibold block">Production Verification Date</span>
+                            <span id="cert-date" class="text-sm font-bold text-slate-800">12-Jan-2024</span>
+                        </div>
+                        <div class="sm:col-span-2 border-t border-slate-200/60 pt-4">
+                            <span class="text-[10px] uppercase text-slate-400 tracking-wider font-semibold block">Device Warranty Coverage</span>
+                            <span class="text-xs text-slate-700">Covered by Nex Gen 15-Year Product Workmanship and 30-Year Linear Power Warranty.</span>
+                        </div>
+                    </div>
+
+                    <!-- Hologram Stamp and Signatures -->
+                    <div class="flex justify-between items-center max-w-xl mx-auto pt-4 border-t border-slate-100">
+                        <div class="text-left">
+                            <div class="w-16 h-16 rounded-full border-4 border-double border-amber-600/30 flex items-center justify-center opacity-70">
+                                <span class="text-[9px] font-extrabold text-amber-700 uppercase tracking-tight text-center">NEX-GEN<br>VERIFIED</span>
+                            </div>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="text-right">
+                            <p class="font-serif italic text-slate-800 text-lg">Zia ul Haq</p>
+                            <p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold border-t border-slate-200 mt-1 pt-1">Lead Inspection Officer</p>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="mt-8 flex flex-col sm:flex-row justify-center gap-3 relative z-20">
+                        <button onclick="window.print()" class="px-6 py-3 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition shadow-lg">
+                            <i class="fa-solid fa-print mr-1"></i> Print / Save PDF
+                        </button>
+                        <button onclick="closeCertificate()" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-100 transition">
+                            Close Verification
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-slate-950 py-12 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-4">
+                <a href="#" class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center">
+                        <i class="fa-solid fa-solar-panel text-white text-sm"></i>
+                    </div>
+                    <span class="text-lg font-black text-white tracking-wider">NEX-GEN</span>
+                </a>
+                <p class="text-xs text-slate-400">Pioneering clean energy solutions across residential, industrial, and mega scale projects.</p>
+            </div>
+            <div>
+                <h5 class="text-xs font-bold uppercase tracking-wider text-white mb-3">Product Specs</h5>
+                <ul class="text-xs space-y-2 text-slate-400">
+                    <li><a href="#specifications" onclick="selectModel('585')" class="hover:text-brand-500">Nex-Gen 585W Panel</a></li>
+                    <li><a href="#specifications" onclick="selectModel('620')" class="hover:text-brand-500">Nex-Gen 620W Panel</a></li>
+                    <li><a href="#specifications" onclick="selectModel('645')" class="hover:text-brand-500">Nex-Gen 645W Panel</a></li>
+                    <li><a href="#specifications" onclick="selectModel('720')" class="hover:text-brand-500">Nex-Gen 720W Panel</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-xs font-bold uppercase tracking-wider text-white mb-3">Quick Navigation</h5>
+                <ul class="text-xs space-y-2 text-slate-400">
+                    <li><a href="#features" class="hover:text-brand-500">Key Features</a></li>
+                    <li><a href="#interactive-model" class="hover:text-brand-500">3D Interactive Viewer</a></li>
+                    <li><a href="#verification" class="hover:text-brand-500">Verify Panel Authenticity</a></li>
+                    <li><a href="#calculator" class="hover:text-brand-500">ROI Yield Calculator</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-xs font-bold uppercase tracking-wider text-white mb-3">Pakistan Support</h5>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Importer: Nex Gen Solar Ltd.<br>
+                    Region: Pakistan Support Operations<br>
+                    Email: support@nexgensolar.com.pk
+                </p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-6 border-t border-white/5 text-center text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p>© 2024 Nex-Gen Solar. All Rights Reserved.</p>
+            <div class="flex gap-4">
+                <a href="#" class="hover:text-brand-500">Privacy Policy</a>
+                <a href="#" class="hover:text-brand-500">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ThreeJS Logic and Interaction Code -->
+    <script>
+        // Model Specifications Database
+        const specDatabase = {
+            '585': {
+                title: 'Nex-Gen 585W',
+                sub: 'Premium Residential PV Module',
+                eff: '22.65%',
+                vmp: '43.80V',
+                imp: '13.36A',
+                dim: '2278 × 1134 × 30 mm',
+                weight: '32.0 kg',
+                region: 'Pakistan (Islamabad Port cleared)',
+                date: '12-Jan-2024'
+            },
+            '620': {
+                title: 'Nex-Gen 620W',
+                sub: 'Commercial Industrial PV Module',
+                eff: '22.90%',
+                vmp: '44.35V',
+                imp: '13.98A',
+                dim: '2384 × 1134 × 30 mm',
+                weight: '34.5 kg',
+                region: 'Pakistan (Karachi Port cleared)',
+                date: '18-Feb-2024'
+            },
+            '645': {
+                title: 'Nex-Gen 645W',
+                sub: 'Industrial Grid-Scale PV Module',
+                eff: '23.10%',
+                vmp: '45.10V',
+                imp: '14.31A',
+                dim: '2465 × 1134 × 35 mm',
+                weight: '36.0 kg',
+                region: 'Pakistan (Port Qasim cleared)',
+                date: '05-Mar-2024'
+            },
+            '720': {
+                title: 'Nex-Gen 720W',
+                sub: 'Ultra-Efficiency Mega Utility PV Module',
+                eff: '23.20%',
+                vmp: '46.90V',
+                imp: '15.36A',
+                dim: '2580 × 1134 × 35 mm',
+                weight: '38.5 kg',
+                region: 'Pakistan (Karachi Port cleared)',
+                date: '20-Apr-2024'
+            }
+        };
+
+        // UI Tabs & Model Selector logic
+        function selectModel(modelNo) {
+            // Update active states of button designs
+            document.querySelectorAll('.model-select-btn').forEach(btn => {
+                btn.className = "model-select-btn w-full text-left p-6 rounded-2xl bg-glass border border-white/5 hover:border-white/20 hover:bg-slate-900/50 transition-all flex justify-between items-center group";
+                const badge = btn.querySelector('span');
+                if (badge) {
+                    badge.className = "text-xs text-slate-400 font-semibold uppercase tracking-wider";
+                }
+            });
+
+            const activeBtn = document.getElementById(`btn-${modelNo}`);
+            activeBtn.className = "model-select-btn w-full text-left p-6 rounded-2xl bg-glass border border-brand-500/30 shadow-lg shadow-brand-500/5 hover:bg-slate-900/50 transition-all flex justify-between items-center group";
+            const activeBadge = activeBtn.querySelector('span');
+            if (activeBadge) {
+                activeBadge.className = "text-xs text-brand-500 font-bold uppercase tracking-wider";
+            }
+
+            // Update details
+            const spec = specDatabase[modelNo];
+            document.getElementById('spec-title').textContent = spec.title;
+            document.getElementById('spec-sub').textContent = spec.sub;
+            document.getElementById('spec-eff').textContent = spec.eff;
+            document.getElementById('spec-vmp').textContent = spec.vmp;
+            document.getElementById('spec-imp').textContent = spec.imp;
+            document.getElementById('spec-dim').textContent = spec.dim;
+            document.getElementById('spec-weight').textContent = spec.weight;
+
+            // Trigger quick animation with GSAP on text update
+            gsap.fromTo('#spec-title', { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.3 });
+            gsap.fromTo('#spec-eff', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4 });
+        }
+
+        // Verification Panel Code
+        function switchVerifyTab(tab) {
+            const btnSerial = document.getElementById('tab-serial');
+            const btnQr = document.getElementById('tab-qr');
+            const secSerial = document.getElementById('panel-serial');
+            const secQr = document.getElementById('panel-qr');
+
+            if (tab === 'serial') {
+                btnSerial.className = "pb-3 text-sm font-bold border-b-2 border-brand-500 text-brand-500 transition-all flex items-center gap-2";
+                btnQr.className = "pb-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-white transition-all flex items-center gap-2";
+                secSerial.classList.remove('hidden');
+                secQr.classList.add('hidden');
+            } else {
+                btnQr.className = "pb-3 text-sm font-bold border-b-2 border-brand-500 text-brand-500 transition-all flex items-center gap-2";
+                btnSerial.className = "pb-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-white transition-all flex items-center gap-2";
+                secQr.classList.remove('hidden');
+                secSerial.classList.add('hidden');
+            }
+        }
+
+        // Perform authenticity validation
+        function verifySerialNumber() {
+            const rawInput = document.getElementById('serial-input').value.trim().toUpperCase();
+            const errDiv = document.getElementById('error-message');
+            errDiv.classList.add('hidden');
+
+            // Find match in our dataset
+            let modelKey = null;
+            if (rawInput.includes('585')) modelKey = '585';
+            else if (rawInput.includes('620')) modelKey = '620';
+            else if (rawInput.includes('645')) modelKey = '645';
+            else if (rawInput.includes('720')) modelKey = '720';
+
+            // Verify patterns starting with standard strings or containing target IDs
+            const isValid = ['NGS-585-PAK', 'NGS-620-PAK', 'NGS-645-PAK', 'NGS-720-PAK'].includes(rawInput) || modelKey;
+
+            if (isValid && modelKey) {
+                // Populate certificate
+                const data = specDatabase[modelKey];
+                document.getElementById('cert-model').textContent = `${data.title} Bifacial TOPCon`;
+                document.getElementById('cert-serial').textContent = rawInput || `NGS-${modelKey}-PAK-` + Math.random().toString(36).substring(2, 7).toUpperCase();
+                document.getElementById('cert-region').textContent = `${data.region}`;
+                document.getElementById('cert-date').textContent = `${data.date}`;
+                
+                showCertificate();
+            } else {
+                errDiv.classList.remove('hidden');
+                gsap.fromTo(errDiv, {x: -10}, {x: 0, duration: 0.1, repeat: 3});
+            }
+        }
+
+        // Simulate Scanner Trigger
+        function triggerSimulatedScan() {
+            const overlay = document.getElementById('qr-scanning-overlay');
+            overlay.classList.remove('hidden');
+
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                // Select a random panel size for simulation success
+                const randomModels = ['585', '620', '645', '720'];
+                const selectedModel = randomModels[Math.floor(Math.random() * randomModels.length)];
+                
+                // Set input as representation
+                document.getElementById('serial-input').value = `NGS-${selectedModel}-PAK`;
+                verifySerialNumber();
+            }, 2500);
+        }
+
+        // Handle Certificate Modal display states
+        function showCertificate() {
+            const modal = document.getElementById('certificate-modal');
+            const box = document.getElementById('certificate-container');
+            
+            modal.classList.remove('hidden');
+            gsap.to(box, { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(1.2)' });
+            
+            // Celebration confetti!
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+        }
+
+        function closeCertificate() {
+            const modal = document.getElementById('certificate-modal');
+            const box = document.getElementById('certificate-container');
+            
+            gsap.to(box, { opacity: 0, scale: 0.9, duration: 0.3, onComplete: () => {
+                modal.classList.add('hidden');
+            }});
+        }
+
+        // ROI Calculator Logic
+        function calculateSavings() {
+            const bill = parseFloat(document.getElementById('bill-range').value);
+            const modelVal = parseFloat(document.getElementById('calc-panel').value);
+            const sunHours = parseFloat(document.getElementById('sun-range').value);
+
+            // Update slider text reads
+            document.getElementById('bill-val').textContent = `PKR ${bill.toLocaleString()}`;
+            document.getElementById('sun-val').textContent = `${sunHours} Hours`;
+
+            // Savings Algorithm based on typical residential setups in Pakistan
+            const tariffPerUnit = 55; // PKR average per kWh
+            const monthlyUnits = bill / tariffPerUnit;
+            const requiredKwp = (monthlyUnits / 30) / sunHours;
+
+            // Compute panel power output mapping
+            const panelPowerKwp = modelVal / 1000;
+            const panelsRequired = Math.ceil(requiredKwp / panelPowerKwp);
+            
+            // Total system sizing
+            const actualSystemSize = (panelsRequired * panelPowerKwp).toFixed(2);
+            
+            // Yearly savings
+            const yearlyPowerYield = actualSystemSize * sunHours * 365; // kWh generated annually
+            const yearlySavings = yearlyPowerYield * tariffPerUnit;
+
+            // Render Output values
+            document.getElementById('out-sys-size').textContent = `${actualSystemSize} kWp`;
+            document.getElementById('out-panels').textContent = `${panelsRequired} Panels`;
+            document.getElementById('out-savings').textContent = `PKR ${Math.round(yearlySavings).toLocaleString()}`;
+        }
+
+        // Initialize calculator values on page load
+        calculateSavings();
+
+
+        /* =======================================================
+           THREE.JS 3D INTERACTIVE PANEL ENGINE
+           ======================================================= */
+        let scene, camera, renderer, solarPanel, controls;
+
+        function init3DViewer() {
+            const container = document.getElementById('hero-3d-canvas-container');
+            if(!container) return;
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Scene Set-up
+            scene = new THREE.Scene();
+
+            // Camera Setup
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(0, 0, 4.5);
+
+            // Renderer Setup
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            // Controls setup
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxDistance = 8;
+            controls.minDistance = 2.5;
+
+            // Lighting Setup
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const dirLightLeft = new THREE.DirectionalLight(0x0ea5e9, 1.8);
+            dirLightLeft.position.set(-5, 5, 5);
+            scene.add(dirLightLeft);
+
+            const dirLightRight = new THREE.DirectionalLight(0x10b981, 1.2);
+            dirLightRight.position.set(5, -3, 3);
+            scene.add(dirLightRight);
+
+            const pointLightFront = new THREE.PointLight(0xffffff, 1.5);
+            pointLightFront.position.set(0, 0, 5);
+            scene.add(pointLightFront);
+
+            // Create Solar Panel Geometry
+            solarPanel = new THREE.Group();
+
+            // 1. Aluminum Frame Design
+            const frameWidth = 1.8;
+            const frameHeight = 3.2;
+            const frameDepth = 0.08;
+
+            const frameMat = new THREE.MeshStandardMaterial({
+                color: 0x8e9eab,
+                metalness: 0.9,
+                roughness: 0.1,
+                name: 'frame'
+            });
+
+            // Outer rectangular frame (Built using 4 thin box edges for structural accuracy)
+            const thickness = 0.04;
+            const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(thickness, frameHeight, frameDepth), frameMat);
+            leftFrame.position.x = -frameWidth/2;
+            solarPanel.add(leftFrame);
+
+            const rightFrame = leftFrame.clone();
+            rightFrame.position.x = frameWidth/2;
+            solarPanel.add(rightFrame);
+
+            const topFrame = new THREE.Mesh(new THREE.BoxGeometry(frameWidth + thickness, thickness, frameDepth), frameMat);
+            topFrame.position.y = frameHeight/2;
+            solarPanel.add(topFrame);
+
+            const bottomFrame = topFrame.clone();
+            bottomFrame.position.y = -frameHeight/2;
+            solarPanel.add(bottomFrame);
+
+            // 2. Glass Base Panel
+            const panelMat = new THREE.MeshPhysicalMaterial({
+                color: 0x061121,
+                roughness: 0.15,
+                metalness: 0.95,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.1,
+                transmission: 0.3,
+                thickness: 0.02
+            });
+            const backGlass = new THREE.Mesh(new THREE.BoxGeometry(frameWidth - 0.02, frameHeight - 0.02, 0.02), panelMat);
+            backGlass.position.z = 0;
+            solarPanel.add(backGlass);
+
+            // 3. Grid of Silicon Cells (Individual Cells for dynamic 3D reflections)
+            const cellRows = 10;
+            const cellCols = 6;
+            const cellWidth = (frameWidth - 0.15) / cellCols;
+            const cellHeight = (frameHeight - 0.25) / cellRows;
+
+            const cellGeometry = new THREE.BoxGeometry(cellWidth - 0.015, cellHeight - 0.015, 0.01);
+            const cellMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x071e3d,
+                roughness: 0.1,
+                metalness: 0.8,
+                clearcoat: 1.0
+            });
+
+            const startX = -((cellCols - 1) * cellWidth) / 2;
+            const startY = -((cellRows - 1) * cellHeight) / 2;
+
+            for (let r = 0; r < cellRows; r++) {
+                for (let c = 0; c < cellCols; c++) {
+                    const cellMesh = new THREE.Mesh(cellGeometry, cellMaterial);
+                    cellMesh.position.set(startX + (c * cellWidth), startY + (r * cellHeight), 0.01);
+                    solarPanel.add(cellMesh);
+
+                    // Add microscopic wire/busbar details over cell blocks
+                    const busBarGeom = new THREE.BoxGeometry(0.002, cellHeight, 0.012);
+                    const busBarMat = new THREE.MeshBasicMaterial({ color: 0xe2e8f0 });
+                    const wire = new THREE.Mesh(busBarGeom, busBarMat);
+                    wire.position.set(startX + (c * cellWidth), startY + (r * cellHeight), 0.01);
+                    solarPanel.add(wire);
+                }
+            }
+
+            // Bring whole panel upward tilted
+            solarPanel.rotation.set(0.3, -0.4, 0);
+            scene.add(solarPanel);
+
+            // Animation Frame Loop
+            function animate() {
+                requestAnimationFrame(animate);
+
+                // Idle rotational spin
+                if(!controls.state == -1) {
+                    solarPanel.rotation.y += 0.003;
+                }
+                
+                controls.update();
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            // Resize Observer
+            window.addEventListener('resize', () => {
+                const w = container.clientWidth;
+                const h = container.clientHeight;
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                renderer.setSize(w, h);
+            });
+        }
+
+        function resetCamera() {
+            gsap.to(camera.position, { x: 0, y: 0, z: 4.5, duration: 1 });
+            gsap.to(solarPanel.rotation, { x: 0.3, y: -0.4, z: 0, duration: 1 });
+        }
+
+        // Run Engine on load
+        window.addEventListener('DOMContentLoaded', () => {
+            init3DViewer();
+        });
+    </script>
+</body>
+</html>
